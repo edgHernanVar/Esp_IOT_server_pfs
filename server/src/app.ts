@@ -6,7 +6,7 @@ const app: Application = express();
 const PORT: string| number = process.env.PORT || 4000;
 
 import apiRouter from './routes/api';
-app.use('/api', apiRouter);
+app.use('/api/v1', apiRouter);
 
 app.listen(PORT, (): void => {
     console.log(`Listening on ${PORT}`);
