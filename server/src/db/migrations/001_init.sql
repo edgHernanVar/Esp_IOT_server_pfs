@@ -45,7 +45,7 @@ CREATE TABLE device_errors (
                                severity         TEXT NOT NULL,              -- "info"|"warning"|"critical"...
                                description      TEXT,
                                count            INTEGER,                    -- error.count
-                               first_occurrence TIMESTAMPTZ,                -- error.first_occurrence
+                               first_occurence TIMESTAMPTZ,                -- error.first_occurrence
                                raw_payload      JSONB NOT NULL,
                                created_at       TIMESTAMPTZ NOT NULL DEFAULT now()
 );
