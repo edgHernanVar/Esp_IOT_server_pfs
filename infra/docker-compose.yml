@@ -1,0 +1,21 @@
+
+services:
+  db:
+    image: postgres:16
+    container_name: pfs_db
+    restart: always
+    env_file:
+      - .env.db
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - "8080:8080"
+
+volumes:
+  db_data:
