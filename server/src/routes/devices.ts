@@ -3,10 +3,23 @@ import {Pool} from "pg";
 
 const devicesRouter = express.Router();
 
-export default function buildDevice(pool: Pool): express.Application {
+export default function buildDevice(pool: Pool): express.Router {
 
-    devicesRouter.get("/", (req: Request, res: Response, next:NextFunction) => {
+    devicesRouter.get("/", async (req: Request, res: Response, next:NextFunction) => {
+        try{
+            const q =`
+                SELECT name,timezone,created_at FROM devices
+            `;
 
+            const {rows} = await pool.query(q);
+
+            if(rows.length === 0){
+                return res.status(404).send("No se encontro dispositivos");
+            }
+            return res.status(200).json(rows);
+        }catch(err){
+            next(err);
+        }
 
 
     });
