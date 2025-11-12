@@ -2,7 +2,8 @@ import express, { Request, Response, NextFunction } from 'express';
 import { ParamsDictionary } from 'express-serve-static-core';
 import { Pool } from 'pg';
 import Ajv, { JSONSchemaType } from 'ajv';
-import crypto from 'node:crypto';
+
+import buildDeviceAuthMiddleware from "../middleware/authDevice";
 
 const ingestsRouter = express.Router();
 
@@ -61,32 +62,18 @@ const validateError = ajv.compile<DeviceErrorPayload>(errorSchema);
 type IngestRequest = Request<ParamsDictionary, unknown, IngestPayload>;
 
 export default function buildIngests(pool: Pool) {
+    ingestsRouter.use(buildDeviceAuthMiddleware(pool));
+
     ingestsRouter.post('/', async (req: IngestRequest, res: Response, next: NextFunction) => {
         try{
-            const deviceId = req.header('X-Device-Id') || '';
-            const deviceKey = req.header('X-Device-Key') || '';
-
-            if(!deviceKey || !deviceId) {
-                return res.status(401).json({error: 'Missing headers'});
+            const authenticatedDevice = req.authenticatedDevice;
+            if (!authenticatedDevice) {
+                return res.status(500).json({error: 'Device authentication context missing'});
             }
-
-            const { rows} = await pool.query(
-                'SELECT api_key_hash FROM devices WHERE device_id = $1',
-                [deviceId],
-            );
-
-            if(rows.length === 0)
-            {
-                return res.status(401).json({error: 'unknown device'});
-            }
-
-            //we get the actual key of the device
-            const hash = crypto.createHash('sha256').update(deviceKey).digest('hex');
-            if (hash !== rows[0].api_key_hash) {
-                return res.status(401).json({error: 'Invalid key'});
-            }
-
             const body = req.body;
+            if(body.device_id !== authenticatedDevice.deviceId) {
+                return res.status(403).json({error: 'Authenticated Device id mismatch'});
+            }
 
             if(validateError(body)) {
                 const q = `
@@ -106,7 +93,7 @@ export default function buildIngests(pool: Pool) {
                 ];
 
                 const insertResult = await pool.query(q, params);
-                return res.status(201).json({ id: insertResult.rows[0].id });
+                return res.status(201).json({ status: 'ok',type:'error',id: insertResult.rows[0].id });
             }
 
             if(validateEvent(body)) {
