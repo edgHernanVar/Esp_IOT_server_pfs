@@ -1,11 +1,13 @@
 import express, { Request, Response, NextFunction } from 'express';
 import buildIngests from './ingests'
+import buildDevice from "./devices";
 const apiRouter = express.Router();
 import {Pool} from 'pg';
 
 export default function buildApi(pool: Pool) {
 
     apiRouter.use('/ingests',buildIngests(pool));
+    apiRouter.use('/devices',buildDevice(pool));
 
     return apiRouter;
 }
