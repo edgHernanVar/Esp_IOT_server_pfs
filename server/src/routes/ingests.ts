@@ -146,6 +146,8 @@ export default function buildIngests(pool: Pool) {
             return res.status(400).json({ error: 'Unsupported payload', details: ajv.errorsText(validateError.errors || validateEvent.errors || []) });
 
         }catch(err){
+            console.error(err);//medida prevetiva lol
+
             next(err);
         }
 
