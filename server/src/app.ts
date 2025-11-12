@@ -3,6 +3,7 @@ import cors from 'cors';
 import bodyParser from 'body-parser';
 import pool, {initDb} from "./db/index";
 import buildApi from "./routes/api";
+import errorHandler from "./middleware/errorHandler";
 
 const PORT: string| number = process.env.SERVER_PORT || 4000;
 
@@ -16,6 +17,8 @@ app.use(express.json());
 const apiRouter = buildApi(pool);
 
 app.use('/api', apiRouter);
+
+app.use(errorHandler);
 
 
 app.listen(PORT, (): void => {
