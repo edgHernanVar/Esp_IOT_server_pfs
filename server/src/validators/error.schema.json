@@ -1,0 +1,22 @@
+{
+  "$id": "error.schema.json",
+  "type": "object",
+  "required": ["device_id", "timestamp", "message_type", "error"],
+  "properties": {
+    "device_id": {"type": "string"},
+    "timestamp": {"type": "string", "format": "date-time"},
+    "message_type": {"const": "error"},
+    "error": {
+      "type": "object",
+      "required": ["code", "severity"],
+      "properties": {
+        "code": {"type": "string"},
+        "severity": {"type": "string"},
+        "description": {"type": "string"},
+        "count": {"type": "integer"},
+        "first_occurrence": {"type": "string", "format": "date-time"}
+      }
+    }
+  },
+  "additionalProperties": true
+}

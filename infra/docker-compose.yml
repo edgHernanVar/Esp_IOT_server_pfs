@@ -1,0 +1,25 @@
+services:
+  db:
+    image: postgres:16
+    container_name: pfs_db
+    restart: always
+    environment:
+      POSTGRES_USER: esp_iot_user
+      POSTGRES_PASSWORD: batman12
+      POSTGRES_DB: esp_iot
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+
+volumes:
+  db_data:
